@@ -276,10 +276,51 @@
         vmnumber="+46735333333"
         vmtag="Voicemail" />
 
-    <voicemail
-        numeric="20820"
-        carrier="Bouygues (France)"
-        vmnumber="660"
+    <voicemail 
+        numeric="72423"
+        carrier="VIVO"
+        vmnumber="*555"
         vmtag="Voicemail" />
 
+    <voicemail 
+        numeric="334050"
+        carrier="BrightStar"
+        vmnumber="186"
+        vmtag="Voicemail" />
+
+    <voicemail 
+        numeric="70403" 
+        carrier="Movistar (Guatemala)" 
+        vmnumber="*86" 
+        vmtag="Voicemail" />
+
+    <voicemail 
+        numeric="704030" 
+        carrier="Movistar (Guatemala)" 
+        vmnumber="*86" 
+        vmtag="Voicemail" />
+
+    <voicemail 
+        numeric="70802" 
+        carrier="Tigo (Honduras)" 
+        vmnumber="*80" 
+        vmtag="Voicemail" />
+
+    <voicemail 
+        numeric="708020" 
+        carrier="Tigo (Honduras)" 
+        vmnumber="*80" 
+        vmtag="Voicemail" />
+
+    <voicemail 
+        numeric="73001" 
+        carrier="Entel (Chile)" 
+        vmnumber="#123" 
+        vmtag="Voicemail" />
+
+    <voicemail 
+        numeric="73010" 
+        carrier="Entel (Chile)" 
+        vmnumber="#123" 
+        vmtag="Voicemail" />
 </voicemail>
