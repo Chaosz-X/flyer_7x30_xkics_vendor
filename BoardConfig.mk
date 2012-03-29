@@ -26,12 +26,12 @@
 # USE_CAMERA_STUB := true
 
 # inherit from common msm7x30
--include device/htc/ace/BoardConfigCommon.mk
+-include device/htc/flyer/BoardConfigCommon.mk
 
 # inherit from the proprietary version
--include vendor/htc/ace/BoardConfigVendor.mk
+-include vendor/htc/flyer/BoardConfigVendor.mk
 
-TARGET_BOOTLOADER_BOARD_NAME := spade
+TARGET_BOOTLOADER_BOARD_NAME := flyer
 
 BOARD_KERNEL_CMDLINE := no_console_suspend=1
 BOARD_KERNEL_RECOVERY_CMDLINE := $(BOARD_KERNEL_CMDLINE) msmsdcc_power_gpio=88
@@ -41,7 +41,7 @@ BOARD_KERNEL_PAGE_SIZE := 4096
 # Workaround for Ace's broken overlay scaling
 BOARD_OVERLAY_MINIFICATION_LIMIT := 2
 
-BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := spade
+BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := flyer
 
 # cat /proc/emmc
 #dev:        size     erasesize name
@@ -55,8 +55,8 @@ BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := spade
 #mmcblk0p29: 00040000 00000200 "pdata"
 
 TARGET_USERIMAGES_USE_EXT4 := true
-BOARD_SYSTEMIMAGE_PARTITION_SIZE := 585101312
-BOARD_USERDATAIMAGE_PARTITION_SIZE := 1232072704
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1073741312
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 4298112512
 BOARD_BOOTIMAGE_PARTITION_SIZE := 4194304
 BOARD_FLASH_BLOCK_SIZE := 262144
 
