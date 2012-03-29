@@ -18,4 +18,4 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/ace.mk
+    $(LOCAL_DIR)/flyer.mk
