@@ -54,7 +54,7 @@ PRODUCT_DEFAULT_PROPERTY += \
 persist.sys.strictmode.visual=0
 
 # I think this is not needed because we disabled it anyway
-# DEVICE_PACKAGE_OVERLAYS += device/htc/flyer/overlay
+DEVICE_PACKAGE_OVERLAYS += device/htc/flyer/overlay
 
 PRODUCT_COPY_FILES += \
     frameworks/base/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml \
