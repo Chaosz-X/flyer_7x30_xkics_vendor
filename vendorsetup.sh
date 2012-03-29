@@ -20,5 +20,5 @@
 # In particular, you can add lunch options with the add_lunch_combo
 # function: add_lunch_combo generic-eng
 
-add_lunch_combo htc_ace-userdebug
-add_lunch_combo htc_ace-eng
+add_lunch_combo htc_flyer-userdebug
+add_lunch_combo htc_flyer-eng
