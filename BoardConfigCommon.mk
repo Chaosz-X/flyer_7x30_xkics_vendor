@@ -30,7 +30,7 @@ TARGET_GLOBAL_CFLAGS += -mfpu=neon -mfloat-abi=softfp
 TARGET_GLOBAL_CPPFLAGS += -mfpu=neon -mfloat-abi=softfp
 ARCH_ARM_HAVE_VFP := true
 
-TARGET_SPECIFIC_HEADER_PATH := device/htc/ace/include
+TARGET_SPECIFIC_HEADER_PATH := device/htc/flyer/include
 
 # Wifi related defines
 BOARD_WPA_SUPPLICANT_DRIVER 	 := WEXT
@@ -59,7 +59,7 @@ BOARD_HAVE_BLUETOOTH_BCM := true
 
 BOARD_VENDOR_QCOM_AMSS_VERSION := 1200
 
-BOARD_EGL_CFG := device/htc/ace/egl.cfg
+BOARD_EGL_CFG := device/htc/flyer/egl.cfg
 
 #BOARD_EGL_GRALLOC_USAGE_FILTER := true
 #BOARD_NO_RGBX_8888 := true
@@ -84,7 +84,7 @@ TARGET_USES_C2D_COMPOSITION := true
 TARGET_USES_SF_BYPASS := true
 TARGET_HAVE_BYPASS := true
 TARGET_QCOM_HDMI_OUT := false
-TARGET_USES_OVERLAY := true
+TARGET_USES_OVERLAY := false
 TARGET_GRALLOC_USES_ASHMEM := true
 
 #USB mount
