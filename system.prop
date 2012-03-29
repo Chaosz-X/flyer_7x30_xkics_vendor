@@ -1,10 +1,7 @@
 #
-# system.prop for ace
+# system.prop for flyer
 #
-ro.sf.lcd_density=240
-
-# Modify MMS APN retry timer from 5s to 2s.
-ro.gsm.2nd_data_retry_config=max_retries=3, 2000, 2000, 2000
+ro.sf.lcd_density=160
 
 rild.libpath=/system/lib/libhtc_ril.so
 
@@ -30,17 +27,18 @@ ro.ril.hsxpa=2
 # 0 => WCDMA preferred.
 ro.telephony.default_network=0
 
-wifi.interface=wlan0
-wifi.supplicant_scan_interval=100
+wifi.interface=eth0
+wifi.supplicant_scan_interval=120
 
-mobiledata.interfaces=gannet0,rmnet0,rmnet1,rmnet2
+# Disabled for the time being, we'll figure it out later
+# mobiledata.interfaces=gannet0,rmnet0,rmnet1,rmnet2
 
 # The OpenGL ES API level that is natively supported by this device.
 # This is a 16.16 fixed point number
 ro.opengles.version=131072
 
 # This is a high density device with more memory, so larger vm heaps for it.
-dalvik.vm.heapsize=64m
+dalvik.vm.heapsize=256m
 
 # For the default value of agps
 ro.ril.def.agps.mode=2
@@ -64,5 +62,7 @@ debug.composition.type=dyn
 ro.sf.compbypass.enable=1
 debug.enabletr=false
 com.qc.hardware=true
+
+# Will enable this later
 com.qc.hdmi_out=false
 ro.config.disable_hw_accel=false
