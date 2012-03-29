@@ -14,11 +14,11 @@
 
 LOCAL_PATH:= $(call my-dir)
 
-ifeq ($(TARGET_DEVICE),ace)
+ifeq ($(TARGET_DEVICE),flyer)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := lights.spade
+LOCAL_MODULE := lights.flyer
 
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 
