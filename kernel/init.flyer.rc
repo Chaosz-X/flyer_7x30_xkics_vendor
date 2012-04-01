@@ -1,0 +1,295 @@
+on emmc
+
+    mkdir /system
+    mkdir /data 0771 system system
+    mkdir /cache 0770 system cache
+	mkdir /devlog 0700 root root
+    devwait emmc@system
+	# exec /system/bin/logwrapper /system/bin/e2fsck -p emmc@system	
+	mount ext4 emmc@system /system ro
+    devwait emmc@userdata
+	# exec /system/bin/logwrapper /system/bin/e2fsck -p /dev/block/mmcblk0p29
+	mount ext4 emmc@userdata /data noatime nosuid nodev nodelalloc
+    devwait emmc@cache
+	# exec /system/bin/logwrapper /system/bin/e2fsck -p /dev/block/mmcblk0p30
+	mount ext4 emmc@cache /cache noatime nosuid nodev nodelalloc
+    devwait emmc@devlog
+	# exec /system/bin/logwrapper /system/bin/e2fsck -p /dev/block/mmcblk0p31
+	mount ext4 emmc@devlog /devlog noatime nosuid nodev nodelalloc
+
+on early-init
+    device mtd@misc 0460 radio diag
+	exec /system/bin/logwrapper /system/bin/htc_ext4_fsck
+    
+    export EXTERNAL_STORAGE /mnt/sdcard
+    # The EXTERNAL_STORAGE2 is important
+    # It is used to overwrite config in Environment.java
+    export EXTERNAL_STORAGE2 /mnt/sdcard/ext_sd 
+    export EXTERNAL_STORAGE4 /mnt/sdcard/usb
+    mkdir /mnt/sdcard 0000 system system
+   
+    # for backwards compatibility
+    symlink /mnt/sdcard /sdcard
+    
+   
+    
+on init
+    # double check the perms and set owner
+    chown root root /devlog
+    chmod 0700 /devlog
+    
+    #mkdir /data/media 0775 media_rw media_rw
+    #mkdir /mnt/ext_sd 0000 system system
+    symlink /mnt/sdcard/ext_sd /sdcard2
+    #mkdir /mnt/usb 0000 system system
+    #mkdir /data/media/ext_sd 0000 system system
+    #mkdir /data/media/usb 0000 system system
+
+    # [3LM] Secure container used for sharing libraries for encrypted apps
+    chmod 0771 /data/secure
+    mkdir /data/secure/data 0771 system system
+    mount tmpfs tmpfs /data/secure/data mode=0771,uid=1000,gid=1000
+
+import init.htc7x30.usb.rc	
+	
+on boot
+    mkdir /data/misc/wifi 0770 wifi wifi
+    mkdir /data/misc/wifi/sockets 0770 wifi wifi
+    mkdir /data/misc/dhcp 0770 dhcp dhcp
+    chown dhcp dhcp /data/misc/dhcp
+    mkdir /data/d 0777 system system
+    mount debugfs /data/d /data/d
+
+    # bluetooth power up/down interface
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
+    chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
+    chmod 0660                /sys/class/rfkill/rfkill0/state
+    chown bluetooth bluetooth /dev/ttyHS0
+    chmod 0660                /dev/ttyHS0
+    
+    # for wireless modem
+	chown system system /sys/module/serial/parameters/modem_enabled
+	chown system system /dev/ttyHSUSB0
+	chown system system /dev/ttySA0
+	chown system system /dev/smd9
+
+	# for Flip to speaker 
+	chown radio radio /sys/class/htc_accelerometer/accelerometer/PhoneOnOffFlag
+	chown radio radio /sys/class/htc_ecompass/ecompass/PhoneOnOffFlag
+
+	# for Optical sensors
+	chown system system /sys/class/optical_sensors/lightsensor/ls_adc
+	chown system system /sys/class/optical_sensors/lightsensor/ls_auto
+	chown system system /sys/class/optical_sensors/lightsensor/ls_kadc
+
+	# Enable Google format for report touch event
+     #write /sys/android_touch/event_google 1
+
+    # set ntrig touch permissions for HTC
+    chown system system /dev/ntrig_touch
+    chmod 0640 /dev/ntrig_touch
+    # set ntrig touch permissions for HTC
+    chown system system /dev/ntrig_analysis
+    chmod 0640 /dev/ntrig_analysis
+
+
+# FUSE to emulate sdcard 
+#service sdcard /system/bin/logwrapper /system/bin/sdcard /data/media 1023 1015
+#    class core
+#    user root
+#    group root
+
+# Discretix DRM
+    mkdir /data/DxDrm
+    mkdir /data/DxDrm/fuse
+    mkdir /data/DxDrm/Credentials
+    mkdir /data/DxDrm/Credentials/PlayReady
+    chmod 555 /data/DxDrm
+    copy /etc/DxPrdyProvisionObf.pkg /data/DxDrm/Credentials/PlayReady/DxPrdyProvisionObf.pkg
+    copy /etc/DxDrmConfig_Server.txt /data/DxDrm/DxDrmConfig_Server.txt
+    
+# Widevine DRM
+	chown drm system /dev/htcdrm
+	chmod 0660 /dev/htcdrm
+
+service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant \
+    -Dwext -ieth0 -c/data/misc/wifi/wpa_supplicant.conf
+#   we will start as root and wpa_supplicant will switch to user wifi
+#   after setting up the capabilities required for WEXT
+#   user wifi
+#   group wifi inet keystore
+    socket wpa_eth0 dgram 660 wifi wifi
+    disabled
+    oneshot
+
+service dhcpcd_eth0 /system/bin/dhcpcd -ABKL eth0
+    disabled
+    oneshot
+
+# [3LM] device manager 3LM service
+service tund /system/bin/tund
+    socket tund stream 0660 vpn system
+    user vpn
+    group vpn net_admin net_raw
+    ioprio be 2
+
+# compass/accelerometer daemon
+service akmd /system/bin/akmd
+    user compass
+    group compass misc input
+
+# ntrig_touch daemon
+service ntrig_touchd /system/bin/ntrig_touchd
+    class core
+    user system
+    group system misc input
+
+# bugreport is triggered by the KEY_VOLUMEUP and BTN_MOUSE keycodes
+service bugreport /system/bin/dumpstate -d -v -o /sdcard/bugreports/bugreport
+    disabled
+    oneshot
+    keycodes 114 115
+
+#service hciattach /system/bin/brcm_patchram_plus --enable_hci --enable_lpm \
+#    --baudrate 3000000 --patchram /etc/firmware/bcm4329.hcd /dev/ttyHS0
+#    user bluetooth
+#    group bluetooth net_bt_admin
+#    disabled
+
+# Make sure we startup btld before hcid
+# Set target address to emulator host loopback IF
+# Limit baudrate to 460800 to ensure reliable uart operation 
+#service btld /system/bin/logwrapper /system/bin/btld -hwtun 10.0.2.2 -hb 460800 3000000 -lpm 1
+service btld /system/bin/logwrapper /system/bin/btld -lpm 1 -hb 3000000
+    user root
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
+
+# for USB internet sharing
+service udhcpd /system/bin/udhcpd
+	disabled
+	oneshot
+
+service netsharing_on /system/bin/netsharing net on
+	disabled
+	oneshot
+
+service netsharing_off /system/bin/netsharing net off
+	disabled
+	oneshot
+
+service netsharing_pass /system/bin/netsharing net_pass on
+	disabled
+	oneshot
+
+service netsh_mtp_on /system/bin/netsharing mtp on
+	disabled
+	oneshot
+
+service netsh_mtp_off /system/bin/netsharing mtp off
+	disabled
+	oneshot
+
+service srv_ser2net /system/bin/ser2net -n
+    disabled
+
+on property:service.ser2net.enable=1
+    start srv_ser2net
+
+on property:service.ser2net.enable=0
+    stop srv_ser2net
+
+service rmt_storage /system/bin/rmt_storage /dev/block/mmcblk0p26 /dev/block/mmcblk0p27
+    user root
+    disabled
+
+on property:ro.emmc=1
+    start rmt_storage
+
+service dmagent /system/bin/dmagent -N
+    socket dmagent stream 660 root radio
+    user root
+    group radio cache inet misc
+
+service hdmid /system/bin/hdmid
+    socket displayd stream 0660 root system graphics
+    disable
+    start hdmid
+
+# for ABL
+service abl-daemon /system/bin/ablserver
+    user system
+    group system graphics
+
+on property:htc.abl.enable=1
+    start abl-daemon
+
+on property:htc.abl.enable=0
+    stop abl-daemon
+
+# Discretix DRM
+service dx_drm_server /system/bin/DxDrmServerIpc -f -o allow_other /data/DxDrm/fuse
+
+# for ABL
+service abl-daemon /system/bin/ablserver
+    user graphics                                                                                                                                            
+    group graphics
+
+on property:htc.abl.enable=1
+    start abl-daemon
+
+on property:htc.abl.enable=0
+    stop abl-daemon
+
+service zchgd_offmode /system/bin/zchgd -pseudooffmode   
+    user root
+    disabled
+
+service zchgd_onmode /system/bin/zchgd -onmode
+    user root
+    oneshot
+
+service clockd /system/bin/clockd
+
+service qb_offmode_alarm /system/bin/qb_offmode_alarm
+    user root
+    disabled
+    oneshot
+
+service thermald /system/bin/thermald
+    user root
+    disabled
+
+on property:init.svc.bootanim=stopped
+    start thermald
+
+# Enable Ebdlog
+service htc_ebdlogd /system/bin/htc_ebdlogd -s -k -P 7
+    user root
+    disabled
+    oneshot
+    ioprio idle 0
+
+service htc_ebdlogd_rel /system/bin/htc_ebdlogd -s -k
+    user root
+    disabled
+    oneshot
+    ioprio idle 0
+
+on property:ro.build.tags=test-keys
+    start htc_ebdlogd
+
+on property:ro.build.tags=release-keys
+    start htc_ebdlogd_rel
+
+service modem /system/xbin/wireless_modem
+    user system
+    group system radio
+    disabled
+
+on property:service.modem.enable=1
+	start modem
+
+on property:service.modem.enable=0
+	stop modem
